@@ -4,22 +4,49 @@ import os
 import json
 import requests
 import numpy as np
-import pandas as pd
-import pdfplumber
 import re
-from openai import OpenAI
-import faiss
+import time
+import threading
+from contextlib import asynccontextmanager
+
+# Core web framework
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
 from typing import List, Dict, Any
-import argparse
 import uvicorn
-from contextlib import asynccontextmanager
 from dotenv import load_dotenv
-import threading
-import time
+
+# Heavy/optional imports with fault tolerance
+try:
+    import pandas as pd
+    print("✅ pandas loaded")
+except ImportError:
+    pd = None
+    print("⚠️ pandas not available")
+
+try:
+    import pdfplumber
+    print("✅ pdfplumber loaded")
+except ImportError:
+    pdfplumber = None
+    print("⚠️ pdfplumber not available")
+
+try:
+    from openai import OpenAI
+    print("✅ openai loaded")
+except ImportError:
+    OpenAI = None
+    print("⚠️ openai not available")
+
+try:
+    import faiss
+    print("✅ faiss loaded")
+except ImportError:
+    faiss = None
+    print("⚠️ faiss not available - will use keyword search fallback")
+
 
 # Load environment variables
 load_dotenv()

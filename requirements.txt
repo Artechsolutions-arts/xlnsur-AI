@@ -1,5 +1,5 @@
 fastapi
-uvicorn
+uvicorn[standard]
 requests
 pydantic
 python-dotenv
@@ -8,3 +8,4 @@ openai
 numpy
 pandas
 faiss-cpu
+gunicorn
