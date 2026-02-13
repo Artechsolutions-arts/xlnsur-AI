@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Environment Variables (Security)
+.env
+
+# IDEs
+.vscode/
+.idea/
+
+# Deployment & Logs
+*.log
+audit_log.jsonl
+*.sqlite
+
+# Local Knowledge Base Artifacts 
+# (Comment these out if you WANT to push pre-computed KBs to Railway)
+# chunks.json
+# faiss_index.bin
+
+# Temporary Uploads
+uploaded_doc.pdf
+temp/
