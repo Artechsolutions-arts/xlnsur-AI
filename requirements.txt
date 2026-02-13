@@ -2,6 +2,7 @@ fastapi
 uvicorn[standard]
 requests
 pydantic
+python-multipart
 python-dotenv
 pdfplumber
 openai

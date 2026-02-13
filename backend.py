@@ -10,7 +10,7 @@ import threading
 from contextlib import asynccontextmanager
 
 # Core web framework
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
@@ -649,6 +649,98 @@ async def serve_dashboard():
 async def liveness_check():
     """Simple liveness check for Railway infrastructure"""
     return JSONResponse(content={"status": "online"}, status_code=200)
+
+@app.post("/upload")
+async def upload_document(file: UploadFile = File(...)):
+    """Upload and process a new PDF document for RAG analysis"""
+    global chunks, index
+    import gc
+    import tempfile
+    
+    if not file.filename.lower().endswith('.pdf'):
+        return JSONResponse(content={"error": "Only PDF files are supported"}, status_code=400)
+    
+    try:
+        # Save uploaded file to temp location
+        content = await file.read()
+        file_size = len(content)
+        print(f"📄 Upload: Received {file.filename} ({file_size} bytes)")
+        
+        temp_path = os.path.join(tempfile.gettempdir(), "uploaded_doc.pdf")
+        with open(temp_path, "wb") as f:
+            f.write(content)
+        del content
+        gc.collect()
+        
+        # Extract text page-by-page
+        if not pdfplumber:
+            return JSONResponse(content={"error": "PDF processing library not available"}, status_code=500)
+        
+        page_texts = []
+        with pdfplumber.open(temp_path) as pdf:
+            total_pages = len(pdf.pages)
+            print(f"📄 Upload: Processing {total_pages} pages...")
+            for page in pdf.pages:
+                text = page.extract_text()
+                if text:
+                    page_texts.append(text)
+        
+        combined = clean_pdf("\n".join(page_texts))
+        del page_texts
+        gc.collect()
+        
+        if not combined:
+            return JSONResponse(content={"error": "Could not extract text from the PDF"}, status_code=400)
+        
+        # Chunk the text
+        new_chunks = simple_chunk_text(combined, 500)
+        del combined
+        gc.collect()
+        
+        # Replace existing chunks
+        chunks.clear()
+        chunks.extend(new_chunks)
+        del new_chunks
+        gc.collect()
+        
+        print(f"✅ Upload: {len(chunks)} segments created")
+        
+        # Build FAISS index if possible
+        if JINA_API_KEY and faiss:
+            try:
+                print(f"🔄 Upload: Building embeddings...")
+                embeds = embed_with_jina(chunks, JINA_API_KEY)
+                if embeds is not None and len(embeds) > 0:
+                    index = build_index(embeds)
+                    print(f"✅ Upload: FAISS index built ({index.ntotal} vectors)")
+                else:
+                    index = None
+                    print("⚠️ Upload: Embedding failed, using keyword search")
+            except Exception as e:
+                index = None
+                print(f"⚠️ Upload: Index build failed: {e}")
+        else:
+            index = None
+        
+        # Clean up temp file
+        try:
+            os.remove(temp_path)
+        except:
+            pass
+        
+        return JSONResponse(content={
+            "status": "success",
+            "filename": file.filename,
+            "pages": total_pages,
+            "chunks": len(chunks),
+            "index_ready": index is not None
+        })
+        
+    except Exception as e:
+        print(f"❌ Upload failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return JSONResponse(content={"error": str(e)}, status_code=500)
 
 # Pydantic models
 class ChatRequest(BaseModel):

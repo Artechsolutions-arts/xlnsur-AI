@@ -555,6 +555,12 @@
         .card-body li {
             margin-bottom: 10px;
         }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 
@@ -614,6 +620,23 @@
                     </svg>
                     New Analysis
                 </button>
+
+                <!-- Document Upload -->
+                <input type="file" id="pdfUpload" accept=".pdf" style="display: none;"
+                    onchange="handleFileUpload(this)">
+                <button class="btn-new-chat" onclick="document.getElementById('pdfUpload').click()"
+                    style="background: linear-gradient(135deg, #10B981, #059669); margin-top: 8px;" id="uploadBtn">
+                    <svg class="icon" style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    Upload Policy PDF
+                </button>
+                <div id="uploadStatus"
+                    style="display: none; padding: 8px 12px; margin-top: 6px; border-radius: 8px; font-size: 0.75rem; background: var(--accent-soft); color: var(--accent); text-align: center;">
+                </div>
             </div>
             <div class="history-list" id="historyList">
                 <div class="history-section-label">Analysis History</div>
@@ -654,6 +677,60 @@
 
         let currentChatId = Date.now().toString();
         let history = JSON.parse(localStorage.getItem('xinsur_history') || '[]');
+
+        // === Document Upload Handler ===
+        async function handleFileUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const uploadBtn = document.getElementById('uploadBtn');
+            const uploadStatus = document.getElementById('uploadStatus');
+            const originalText = uploadBtn.innerHTML;
+
+            // Show uploading state
+            uploadBtn.innerHTML = `<svg class="icon" style="width:16px;height:16px;animation:spin 1s linear infinite" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="30 70"/></svg> Processing...`;
+            uploadBtn.disabled = true;
+            uploadBtn.style.opacity = '0.7';
+            uploadStatus.style.display = 'block';
+            uploadStatus.textContent = `Uploading ${file.name}...`;
+            uploadStatus.style.background = 'var(--accent-soft)';
+            uploadStatus.style.color = 'var(--accent)';
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const response = await fetch(`${API_URL}/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.status === 'success') {
+                    uploadStatus.innerHTML = `✅ <strong>${data.filename}</strong><br>${data.pages} pages → ${data.chunks} segments${data.index_ready ? ' → AI Index Ready' : ' → Keyword Search'}`;
+                    uploadStatus.style.background = 'rgba(16, 185, 129, 0.1)';
+                    uploadStatus.style.color = '#10B981';
+
+                    // Add system message to chat
+                    appendMessage('bot', `📄 **Document Loaded:** ${data.filename}\n\n✅ ${data.pages} pages processed into ${data.chunks} knowledge segments.\n${data.index_ready ? '🔍 AI semantic search is active.' : '🔍 Keyword search is active.'}\n\nYou can now ask questions about this document.`);
+                } else {
+                    uploadStatus.textContent = `❌ ${data.error || 'Upload failed'}`;
+                    uploadStatus.style.background = 'rgba(239, 68, 68, 0.1)';
+                    uploadStatus.style.color = '#EF4444';
+                }
+            } catch (err) {
+                uploadStatus.textContent = `❌ Network error: ${err.message}`;
+                uploadStatus.style.background = 'rgba(239, 68, 68, 0.1)';
+                uploadStatus.style.color = '#EF4444';
+            }
+
+            // Reset button
+            uploadBtn.innerHTML = originalText;
+            uploadBtn.disabled = false;
+            uploadBtn.style.opacity = '1';
+            input.value = ''; // Allow re-uploading same file
+        }
 
         function saveHistory() {
             localStorage.setItem('xinsur_history', JSON.stringify(history));
