@@ -843,23 +843,32 @@ async def get_governance_data():
     }
 
 if __name__ == "__main__":
-    # Check for required environment variables
-    if not NVAPI_KEY:
-        print("Warning: NVAPI_KEY environment variable not set")
-    if not JINA_API_KEY:
-        print("Warning: JINA_API_KEY environment variable not set")
+    # === RAILWAY DEPLOYMENT DIAGNOSTICS ===
+    print("=" * 60)
+    print("xInsur AI — Startup Diagnostics")
+    print("=" * 60)
     
-    # FINAL HARNESS: Force bind to host's dynamic port
-    port = int(os.getenv("PORT", os.getenv("API_PORT", 8050)))
-    host = os.getenv("API_HOST", "0.0.0.0")
+    # Print ALL port-related env vars for debugging
+    env_port = os.getenv("PORT")
+    env_api_port = os.getenv("API_PORT")
+    env_api_host = os.getenv("API_HOST")
+    
+    print(f"  ENV PORT      = {env_port}")
+    print(f"  ENV API_PORT  = {env_api_port}")
+    print(f"  ENV API_HOST  = {env_api_host}")
+    print(f"  ENV NVAPI_KEY = {'SET' if NVAPI_KEY else 'NOT SET'}")
+    print(f"  ENV JINA_KEY  = {'SET' if JINA_API_KEY else 'NOT SET'}")
+    
+    # PORT is what Railway injects. This is the ONLY port Railway routes to.
+    port = int(env_port) if env_port else int(env_api_port) if env_api_port else 8050
+    host = env_api_host if env_api_host else "0.0.0.0"
+    
+    print(f"\n  >>> BINDING TO: {host}:{port}")
+    print("=" * 60)
     
     try:
-        print("--------------------------------------------------")
-        print(f"� GATEWAY_INIT: Binding to {host}:{port}")
-        print(f"🔐 GOVERNANCE: SR 11-7 Protocols Loaded")
-        print(f"🚀 VERSION: 2.2.0 Active")
-        print("--------------------------------------------------")
-        
         uvicorn.run(app, host=host, port=port, log_level="info")
     except Exception as e:
-        print(f"❌ CRITICAL_ERROR: {e}")
+        print(f"CRITICAL STARTUP ERROR: {e}")
+        import traceback
+        traceback.print_exc()

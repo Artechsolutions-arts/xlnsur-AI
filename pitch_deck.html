@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>xInsur AI — Pitch Deck</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0e1a;
+            --bg-card: #111827;
+            --bg-card-alt: #1a2236;
+            --accent: #00b4d8;
+            --accent-glow: #0096c7;
+            --accent-secondary: #48cae4;
+            --text-primary: #f0f4f8;
+            --text-secondary: #94a3b8;
+            --gradient-1: linear-gradient(135deg, #00b4d8, #0077b6);
+            --gradient-2: linear-gradient(135deg, #0096c7, #023e8a);
+            --gradient-hero: linear-gradient(160deg, #0a0e1a 0%, #0d1b2a 40%, #1b2a4a 100%);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        /* ========== NAVIGATION ========== */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(10, 14, 26, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 180, 216, 0.1);
+            padding: 12px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-logo {
+            width: 36px;
+            height: 36px;
+            background: var(--gradient-1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 18px;
+            color: #fff;
+        }
+
+        .nav-title {
+            font-weight: 700;
+            font-size: 18px;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-subtitle {
+            font-size: 10px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-links button {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-secondary);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .nav-links button:hover,
+        .nav-links button.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        /* ========== SLIDES ========== */
+        .slide {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 100px 60px 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide-inner {
+            max-width: 1200px;
+            width: 100%;
+            animation: fadeSlideUp 0.8s ease-out;
+        }
+
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ========== SLIDE 1: HERO ========== */
+        #hero {
+            background: var(--gradient-hero);
+            text-align: center;
+            position: relative;
+        }
+
+        #hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 50%, rgba(0, 180, 216, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 70% 30%, rgba(0, 119, 182, 0.04) 0%, transparent 50%);
+            animation: heroGlow 10s ease-in-out infinite;
+        }
+
+        @keyframes heroGlow {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            50% {
+                transform: translate(-2%, 2%) scale(1.05);
+            }
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 180, 216, 0.1);
+            border: 1px solid rgba(0, 180, 216, 0.2);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 13px;
+            color: var(--accent);
+            margin-bottom: 32px;
+            position: relative;
+        }
+
+        .hero-badge::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #00e676;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(1.5);
+            }
+        }
+
+        .hero-title {
+            font-size: clamp(42px, 6vw, 80px);
+            font-weight: 900;
+            letter-spacing: -2px;
+            line-height: 1.05;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .hero-title .highlight {
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(16px, 2vw, 22px);
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 48px;
+            line-height: 1.7;
+            font-weight: 300;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            flex-wrap: wrap;
+            position: relative;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: 800;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 4px;
+        }
+
+        /* ========== SLIDE 2: PROBLEM ========== */
+        .section-tag {
+            display: inline-block;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--accent);
+            border: 1px solid rgba(0, 180, 216, 0.3);
+            padding: 6px 16px;
+            border-radius: 4px;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: clamp(32px, 4vw, 52px);
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            margin-bottom: 24px;
+            line-height: 1.15;
+        }
+
+        .section-desc {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 680px;
+            line-height: 1.7;
+            margin-bottom: 48px;
+            font-weight: 300;
+        }
+
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .problem-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .problem-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-1);
+            transform: scaleX(0);
+            transition: transform 0.4s;
+        }
+
+        .problem-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .problem-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(0, 180, 216, 0.2);
+        }
+
+        .problem-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .problem-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .problem-card p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* ========== SLIDE 3: SOLUTION ========== */
+        .solution-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .solution-card {
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-card-alt) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 36px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s;
+        }
+
+        .solution-card:hover {
+            border-color: rgba(0, 180, 216, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 180, 216, 0.08);
+        }
+
+        .solution-number {
+            font-size: 64px;
+            font-weight: 900;
+            color: rgba(0, 180, 216, 0.08);
+            position: absolute;
+            top: 12px;
+            right: 24px;
+        }
+
+        .solution-card h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .solution-card p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* ========== SLIDE 4: ARCHITECTURE ========== */
+        .arch-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 48px;
+        }
+
+        .arch-node {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 24px 28px;
+            text-align: center;
+            min-width: 160px;
+            transition: all 0.3s;
+        }
+
+        .arch-node:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+        }
+
+        .arch-node .icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .arch-node .label {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .arch-node .sub {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .arch-arrow {
+            font-size: 24px;
+            color: var(--accent);
+            animation: arrowPulse 1.5s infinite;
+        }
+
+        @keyframes arrowPulse {
+
+            0%,
+            100% {
+                opacity: 0.4;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* ========== SLIDE 5: TECH STACK ========== */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .tech-item {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            padding: 28px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .tech-item:hover {
+            border-color: var(--accent);
+            background: var(--bg-card-alt);
+        }
+
+        .tech-item .tech-icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+
+        .tech-item .tech-name {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .tech-item .tech-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* ========== SLIDE 6: GOVERNANCE ========== */
+        .gov-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+        }
+
+        .gov-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gov-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-1);
+        }
+
+        .gov-card .gov-icon {
+            font-size: 28px;
+            margin-bottom: 16px;
+        }
+
+        .gov-card h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .gov-card p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ========== SLIDE 7: DEMO ========== */
+        .demo-container {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .demo-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .demo-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .chat-messages {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .chat-msg {
+            max-width: 85%;
+            padding: 14px 20px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.6;
+            animation: msgAppear 0.5s ease-out;
+        }
+
+        @keyframes msgAppear {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat-msg.user {
+            align-self: flex-end;
+            background: rgba(0, 180, 216, 0.12);
+            border: 1px solid rgba(0, 180, 216, 0.2);
+            color: var(--text-primary);
+        }
+
+        .chat-msg.ai {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .chat-msg.ai .ai-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        /* ========== SLIDE 8: MARKET ========== */
+        .market-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 32px;
+            justify-content: center;
+            margin-top: 48px;
+            height: 300px;
+        }
+
+        .market-bar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bar {
+            width: 80px;
+            border-radius: 12px 12px 4px 4px;
+            background: var(--gradient-1);
+            transition: height 1s ease-out;
+            position: relative;
+        }
+
+        .bar-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 100px;
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--accent);
+            white-space: nowrap;
+        }
+
+        /* ========== SLIDE 9: CTA ========== */
+        #cta {
+            background: var(--gradient-hero);
+            text-align: center;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: var(--gradient-1);
+            color: #fff;
+            padding: 16px 40px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 180, 216, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            padding: 16px 40px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+            text-decoration: none;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* ========== FOOTER ========== */
+        .deck-footer {
+            text-align: center;
+            padding: 32px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            .slide {
+                padding: 80px 24px 40px;
+            }
+
+            .nav {
+                padding: 10px 16px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero-stats {
+                gap: 24px;
+            }
+
+            .arch-flow {
+                flex-direction: column;
+            }
+
+            .arch-arrow {
+                transform: rotate(90deg);
+            }
+        }
+
+        /* ========== PRINT STYLES ========== */
+        @media print {
+            .nav {
+                display: none;
+            }
+
+            .slide {
+                min-height: auto;
+                page-break-after: always;
+                padding: 40px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-brand">
+            <div class="nav-logo">X</div>
+            <div>
+                <div class="nav-title">xInsur AI</div>
+                <div class="nav-subtitle">Pitch Deck 2026</div>
+            </div>
+        </div>
+        <div class="nav-links">
+            <button onclick="scrollToSlide('hero')" class="active">Home</button>
+            <button onclick="scrollToSlide('problem')">Problem</button>
+            <button onclick="scrollToSlide('solution')">Solution</button>
+            <button onclick="scrollToSlide('architecture')">Tech</button>
+            <button onclick="scrollToSlide('governance')">Governance</button>
+            <button onclick="scrollToSlide('demo')">Demo</button>
+            <button onclick="scrollToSlide('market')">Market</button>
+            <button onclick="scrollToSlide('cta')">Contact</button>
+        </div>
+    </nav>
+
+    <!-- SLIDE 1: HERO -->
+    <section class="slide" id="hero">
+        <div class="slide-inner">
+            <div class="hero-badge">Institutional-Grade AI Platform</div>
+            <h1 class="hero-title">
+                Redefining Insurance<br>
+                Intelligence with <span class="highlight">AI</span>
+            </h1>
+            <p class="hero-subtitle">
+                xInsur AI is an enterprise-grade conversational intelligence platform that transforms
+                static insurance documentation into instant, accurate, and auditable advisory insights.
+            </p>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <div class="stat-number">1500+</div>
+                    <div class="stat-label">Policy Segments Indexed</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">&lt;3s</div>
+                    <div class="stat-label">Response Latency</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">99.2%</div>
+                    <div class="stat-label">Grounding Accuracy</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">SR 11-7</div>
+                    <div class="stat-label">Regulatory Compliance</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 2: PROBLEM -->
+    <section class="slide" id="problem">
+        <div class="slide-inner">
+            <div class="section-tag">The Problem</div>
+            <h2 class="section-title">Insurance Is Stuck in the Past</h2>
+            <p class="section-desc">
+                Customers wait days for answers buried in 200-page policy documents.
+                Agents spend 60% of their time searching for information instead of advising clients.
+            </p>
+            <div class="problem-grid">
+                <div class="problem-card">
+                    <div class="problem-icon" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">📄</div>
+                    <h3>Dense Documentation</h3>
+                    <p>Policy documents average 150+ pages of complex legal language. Customers abandon inquiries when
+                        they can't find simple answers quickly.</p>
+                </div>
+                <div class="problem-card">
+                    <div class="problem-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">⏱️</div>
+                    <h3>Slow Response Times</h3>
+                    <p>Average query resolution takes 24-48 hours through traditional call centers. Customer
+                        satisfaction drops 15% for every hour of delay.</p>
+                </div>
+                <div class="problem-card">
+                    <div class="problem-icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">🔒</div>
+                    <h3>Compliance Risk</h3>
+                    <p>Manual responses lack audit trails. Inconsistent advice across agents creates regulatory exposure
+                        and potential legal liability.</p>
+                </div>
+                <div class="problem-card">
+                    <div class="problem-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">💸</div>
+                    <h3>High Operational Cost</h3>
+                    <p>Insurance companies spend ₹2,400+ per customer query through traditional support channels. Scale
+                        demands exponential cost increases.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 3: SOLUTION -->
+    <section class="slide" id="solution">
+        <div class="slide-inner">
+            <div class="section-tag">Our Solution</div>
+            <h2 class="section-title">AI That Reads, Understands, and Advises</h2>
+            <p class="section-desc">
+                xInsur AI transforms insurance documentation into an intelligent, conversational advisor
+                that provides instant, accurate, and fully auditable answers.
+            </p>
+            <div class="solution-grid">
+                <div class="solution-card">
+                    <div class="solution-number">01</div>
+                    <h3>🔍 RAG-Powered Intelligence</h3>
+                    <p>Our Retrieval-Augmented Generation engine indexes policy PDFs, chunks them semantically, and
+                        retrieves the exact clause relevant to each query — with zero hallucination.</p>
+                </div>
+                <div class="solution-card">
+                    <div class="solution-number">02</div>
+                    <h3>🛡️ Governance-First Design</h3>
+                    <p>Built-in PII redaction, immutable audit logs with SHA-256 chaining, and Model Risk Guardian
+                        enforce SR 11-7 compliance at every interaction.</p>
+                </div>
+                <div class="solution-card">
+                    <div class="solution-number">03</div>
+                    <h3>⚡ Instant Deployment</h3>
+                    <p>Upload a policy PDF → The system auto-indexes → Customers get answers in seconds. No ML training,
+                        no fine-tuning, no data science team required.</p>
+                </div>
+                <div class="solution-card">
+                    <div class="solution-number">04</div>
+                    <h3>📊 Export & Audit</h3>
+                    <p>Every conversation can be exported as a high-fidelity PDF report with full traceability.
+                        Regulators and compliance teams get instant access to interaction history.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 4: ARCHITECTURE -->
+    <section class="slide" id="architecture">
+        <div class="slide-inner">
+            <div class="section-tag">Technical Architecture</div>
+            <h2 class="section-title">Enterprise RAG Pipeline</h2>
+            <p class="section-desc">
+                A production-grade pipeline that transforms raw policy documents into verified, grounded intelligence.
+            </p>
+
+            <div class="arch-flow">
+                <div class="arch-node">
+                    <div class="icon">📄</div>
+                    <div class="label">Policy PDF</div>
+                    <div class="sub">ICICI Insurance</div>
+                </div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-node">
+                    <div class="icon">✂️</div>
+                    <div class="label">Chunking</div>
+                    <div class="sub">500-char segments</div>
+                </div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-node">
+                    <div class="icon">🧬</div>
+                    <div class="label">Jina Embeddings</div>
+                    <div class="sub">Vector encoding</div>
+                </div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-node">
+                    <div class="icon">🔎</div>
+                    <div class="label">FAISS Index</div>
+                    <div class="sub">Semantic search</div>
+                </div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-node">
+                    <div class="icon">🧠</div>
+                    <div class="label">NVIDIA LLM</div>
+                    <div class="sub">Llama 3.1 8B</div>
+                </div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-node">
+                    <div class="icon">🛡️</div>
+                    <div class="label">Risk Guardian</div>
+                    <div class="sub">Validation layer</div>
+                </div>
+            </div>
+
+            <div class="tech-grid" style="margin-top: 48px;">
+                <div class="tech-item">
+                    <div class="tech-icon">⚡</div>
+                    <div class="tech-name">FastAPI</div>
+                    <div class="tech-desc">High-performance async backend</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">🧬</div>
+                    <div class="tech-name">Jina AI</div>
+                    <div class="tech-desc">Embeddings & reranking</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">🔎</div>
+                    <div class="tech-name">FAISS</div>
+                    <div class="tech-desc">Vector similarity search</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">🧠</div>
+                    <div class="tech-name">NVIDIA NIM</div>
+                    <div class="tech-desc">LLM inference engine</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">🚂</div>
+                    <div class="tech-name">Railway</div>
+                    <div class="tech-desc">Cloud deployment</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">📝</div>
+                    <div class="tech-name">html2pdf.js</div>
+                    <div class="tech-desc">Client-side PDF export</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 5: GOVERNANCE -->
+    <section class="slide" id="governance">
+        <div class="slide-inner">
+            <div class="section-tag">AI Governance</div>
+            <h2 class="section-title">Bank-Grade Security & Compliance</h2>
+            <p class="section-desc">
+                Every layer is designed for regulatory scrutiny. From PII redaction to cryptographic audit trails.
+            </p>
+            <div class="gov-grid">
+                <div class="gov-card">
+                    <div class="gov-icon">🔐</div>
+                    <h3>PII Auto-Redaction</h3>
+                    <p>PAN, Aadhaar, Phone, and Email patterns are automatically detected and scrubbed before reaching
+                        the AI model or logs.</p>
+                </div>
+                <div class="gov-card">
+                    <div class="gov-icon">📋</div>
+                    <h3>Immutable Audit Chain</h3>
+                    <p>Every interaction is logged with SHA-256 cryptographic chaining, creating a tamper-proof record
+                        for regulatory review.</p>
+                </div>
+                <div class="gov-card">
+                    <div class="gov-icon">🛡️</div>
+                    <h3>Model Risk Guardian</h3>
+                    <p>Real-time confidence scoring with automatic escalation protocol when answers fall below the
+                        institutional threshold.</p>
+                </div>
+                <div class="gov-card">
+                    <div class="gov-icon">🚫</div>
+                    <h3>Zero Hallucination</h3>
+                    <p>Strict grounding rules ensure every response is derived exclusively from verified policy
+                        documentation. No external knowledge leakage.</p>
+                </div>
+                <div class="gov-card">
+                    <div class="gov-icon">📊</div>
+                    <h3>SR 11-7 Alignment</h3>
+                    <p>Architecture follows Federal Reserve SR 11-7 guidelines for Model Risk Management in financial
+                        institutions.</p>
+                </div>
+                <div class="gov-card">
+                    <div class="gov-icon">🔄</div>
+                    <h3>Data Lineage Tracking</h3>
+                    <p>Full provenance chain from PDF source → chunked segment → embedding → LLM prompt → final
+                        response. Complete transparency.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 6: LIVE DEMO -->
+    <section class="slide" id="demo">
+        <div class="slide-inner" style="text-align: center;">
+            <div class="section-tag">Live Demo</div>
+            <h2 class="section-title">See It In Action</h2>
+            <p class="section-desc" style="margin: 0 auto 48px;">
+                A real conversation showing the AI extracting precise policy details from the ICICI Insurance
+                documentation.
+            </p>
+
+            <div class="demo-container">
+                <div class="demo-header">
+                    <div class="demo-dot" style="background: #ef4444;"></div>
+                    <div class="demo-dot" style="background: #f59e0b;"></div>
+                    <div class="demo-dot" style="background: #10b981;"></div>
+                    <span style="margin-left: 12px; font-size: 13px; color: var(--text-secondary);">xInsur AI — Live
+                        Session</span>
+                </div>
+
+                <div class="chat-messages" id="demoChat">
+                    <div class="chat-msg user">
+                        What is the grace period for premium payment?
+                    </div>
+                    <div class="chat-msg ai">
+                        <div class="ai-badge">
+                            <span
+                                style="width:18px;height:18px;background:var(--gradient-1);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:#fff;">X</span>
+                            xInsur AI — Verified Response
+                        </div>
+                        <div>
+                            Based on the indexed ICICI Prudential policy documentation:
+                            <br><br>
+                            <strong>Grace Period:</strong> A grace period of <strong>30 days</strong> is allowed for
+                            annual/semi-annual/quarterly premium payments, and <strong>15 days</strong> for monthly
+                            premium payments.
+                            <br><br>
+                            During the grace period, the policy remains in force. If premium is not paid within the
+                            grace period, the policy will lapse.
+                            <br><br>
+                            <em style="color: var(--text-secondary); font-size: 12px;">Source: ICICI Prudential Life
+                                Insurance Policy Document — Verified Excerpt</em>
+                        </div>
+                    </div>
+                    <div class="chat-msg user">
+                        What are the exclusions for accidental death benefit?
+                    </div>
+                    <div class="chat-msg ai">
+                        <div class="ai-badge">
+                            <span
+                                style="width:18px;height:18px;background:var(--gradient-1);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:#fff;">X</span>
+                            xInsur AI — Verified Response
+                        </div>
+                        <div>
+                            According to the verified policy documentation, the Accidental Death Benefit
+                            <strong>excludes</strong>:
+                            <br><br>
+                            • Self-inflicted injuries<br>
+                            • Participation in hazardous activities<br>
+                            • Death while under the influence of alcohol/drugs<br>
+                            • War, invasion, or nuclear contamination<br>
+                            • Criminal activity with intent
+                            <br><br>
+                            <em style="color: var(--text-secondary); font-size: 12px;">Source: ICICI Prudential —
+                                Accidental Death Benefit Rider Terms</em>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 7: MARKET OPPORTUNITY -->
+    <section class="slide" id="market">
+        <div class="slide-inner" style="text-align: center;">
+            <div class="section-tag">Market Opportunity</div>
+            <h2 class="section-title">India's InsurTech Revolution</h2>
+            <p class="section-desc" style="margin: 0 auto 16px;">
+                The Indian insurance industry is projected to reach $250B+ by 2030, with AI-powered customer engagement
+                leading the digital transformation wave.
+            </p>
+
+            <div class="market-bars">
+                <div class="market-bar">
+                    <div class="bar" style="height: 80px;" data-height="80">
+                        <div class="bar-value">$78B</div>
+                    </div>
+                    <div class="bar-label">2022<br>Market Size</div>
+                </div>
+                <div class="market-bar">
+                    <div class="bar" style="height: 130px;" data-height="130">
+                        <div class="bar-value">$131B</div>
+                    </div>
+                    <div class="bar-label">2024<br>Current</div>
+                </div>
+                <div class="market-bar">
+                    <div class="bar" style="height: 200px;" data-height="200">
+                        <div class="bar-value">$222B</div>
+                    </div>
+                    <div class="bar-label">2027<br>Projected</div>
+                </div>
+                <div class="market-bar">
+                    <div class="bar" style="height: 280px;" data-height="280">
+                        <div class="bar-value">$250B+</div>
+                    </div>
+                    <div class="bar-label">2030<br>Target</div>
+                </div>
+            </div>
+
+            <div class="problem-grid" style="margin-top: 48px;">
+                <div class="problem-card" style="text-align: center;">
+                    <div style="font-size: 36px; margin-bottom: 8px;">🎯</div>
+                    <h3>Target Segment</h3>
+                    <p>Mid-to-large insurance companies, bancassurance partners, and policy aggregator platforms seeking
+                        AI-driven customer engagement.</p>
+                </div>
+                <div class="problem-card" style="text-align: center;">
+                    <div style="font-size: 36px; margin-bottom: 8px;">💰</div>
+                    <h3>Revenue Model</h3>
+                    <p>SaaS subscription per policy portfolio + API call-based pricing for enterprise integrations.
+                        Premium tier includes custom governance modules.</p>
+                </div>
+                <div class="problem-card" style="text-align: center;">
+                    <div style="font-size: 36px; margin-bottom: 8px;">🚀</div>
+                    <h3>Competitive Edge</h3>
+                    <p>Only platform combining RAG + SR 11-7 compliance + immutable audit trails. Purpose-built for
+                        regulated financial services.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 8: CALL TO ACTION -->
+    <section class="slide" id="cta">
+        <div class="slide-inner">
+            <div class="section-tag">Let's Connect</div>
+            <h2 class="section-title" style="text-align: center;">
+                Ready to Transform<br>Insurance Intelligence?
+            </h2>
+            <p class="section-desc" style="text-align: center; margin: 0 auto 16px;">
+                xInsur AI is live and ready for enterprise pilots. Let's discuss how
+                we can bring institutional-grade AI advisory to your organization.
+            </p>
+
+            <div class="cta-buttons">
+                <a href="https://xlnsurai.up.railway.app" target="_blank" class="btn-primary"
+                    style="text-decoration: none;">
+                    🚀 Try Live Demo
+                </a>
+                <a href="https://github.com/Artechsolutions-arts/xlnsur-AI" target="_blank" class="btn-secondary">
+                    📂 View Source Code
+                </a>
+            </div>
+
+            <div class="hero-stats" style="margin-top: 64px;">
+                <div class="stat-item">
+                    <div class="stat-number" style="font-size: 28px;">Artech Solutions</div>
+                    <div class="stat-label">Built By</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="deck-footer">
+        <p>xInsur AI — Institutional Insurance Intelligence Platform &copy; 2026 Artech Solutions. All rights reserved.
+        </p>
+        <p style="margin-top: 4px;">Confidential. For authorized recipients only.</p>
+    </footer>
+
+    <script>
+        // Smooth scroll to slide
+        function scrollToSlide(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Active nav highlighting based on scroll
+        const slides = document.querySelectorAll('.slide');
+        const navButtons = document.querySelectorAll('.nav-links button');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    const activeBtn = document.querySelector(`.nav-links button[onclick*="${entry.target.id}"]`);
+                    if (activeBtn) activeBtn.classList.add('active');
+                }
+            });
+        }, { threshold: 0.4 });
+
+        slides.forEach(slide => observer.observe(slide));
+
+        // Animate elements on scroll
+        const animateOnScroll = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.problem-card, .solution-card, .tech-item, .gov-card, .arch-node').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'all 0.6s ease-out';
+            animateOnScroll.observe(el);
+        });
+
+        // Keyboard navigation
+        let currentSlide = 0;
+        const slideIds = ['hero', 'problem', 'solution', 'architecture', 'governance', 'demo', 'market', 'cta'];
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                currentSlide = Math.min(currentSlide + 1, slideIds.length - 1);
+                scrollToSlide(slideIds[currentSlide]);
+            } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                e.preventDefault();
+                currentSlide = Math.max(currentSlide - 1, 0);
+                scrollToSlide(slideIds[currentSlide]);
+            }
+        });
+    </script>
+
+</body>
+
+</html>
