@@ -571,15 +571,14 @@ def initialize_knowledge_base_sync():
 app = FastAPI(
     title="xInsur AI Enterprise Gateway",
     description="Institutional-grade insurance intelligence platform",
-    version="2.0.0",
+    version="2.1.0",
     lifespan=lifespan
 )
 
-# Standardize security headers and CORS for Railway deployment
-origins = os.getenv("ALLOWED_ORIGINS", "*").split(",")
+# Mandatory CORS liberalization for Railway production gateway
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
