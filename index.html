@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>xInsur AI | Institutional Advisory Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=JetBrains+Mono&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --bg-page: #F8FAFC;
+            --bg-card: #FFFFFF;
+            --text-main: #0F172A;
+            --text-dim: #64748B;
+            --accent: #2563EB;
+            --accent-soft: #DBEAFE;
+            --border: #E2E8F0;
+            --shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+            --btn-text: #FFFFFF;
+            --input-bg: #FFFFFF;
+        }
+
+        [data-theme="dark"] {
+            --bg-page: #020617;
+            --bg-card: #0F172A;
+            --text-main: #F1F5F9;
+            --text-dim: #94A3B8;
+            --accent: #38BDF8;
+            --accent-soft: rgba(56, 189, 248, 0.1);
+            --border: rgba(255, 255, 255, 0.08);
+            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+            --btn-text: #020617;
+            --input-bg: #1E293B;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-page);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            width: 300px;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 50;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .btn-new-chat {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent);
+            color: var(--btn-text);
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+
+        .btn-new-chat:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .history-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .history-item {
+            padding: 12px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            border: 1px solid transparent;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .history-item:hover {
+            background: var(--accent-soft);
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .history-item.active {
+            background: var(--accent-soft);
+            color: var(--accent);
+            border-color: var(--accent);
+            font-weight: 600;
+        }
+
+        .history-section-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-dim);
+            margin: 20px 0 10px 5px;
+            font-weight: 800;
+            opacity: 0.6;
+        }
+
+        h1,
+        h2,
+        h3,
+        .brand-text {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* --- Header --- */
+        .header {
+            height: 80px;
+            border-bottom: 1px solid var(--border);
+            padding: 0 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-card);
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+
+        .brand-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo-box {
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.4rem;
+            color: #FFFFFF;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        [data-theme="dark"] .logo-box {
+            color: #020617;
+        }
+
+        .brand-text h1 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--text-main);
+        }
+
+        .brand-text span {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-dim);
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .theme-toggle-btn {
+            background: var(--bg-page);
+            border: 1px solid var(--border);
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-main);
+        }
+
+        .theme-toggle-btn:hover {
+            border-color: var(--accent);
+            background: var(--bg-card);
+        }
+
+        .btn-export {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-export:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+            background: var(--accent-soft);
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10B981;
+            box-shadow: 0 0 8px #10B981;
+        }
+
+        /* --- Content Area --- */
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-page);
+            position: relative;
+        }
+
+        .workspace {
+            flex: 1;
+            overflow-y: auto;
+            padding: 60px 10%;
+            scroll-behavior: smooth;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .welcome-hero {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .welcome-hero h2 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            letter-spacing: -0.04em;
+            color: var(--text-main);
+        }
+
+        .welcome-hero p {
+            color: var(--text-dim);
+            font-size: 1.25rem;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* --- Advisory Cards --- */
+        .card {
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-meta {
+            display: none;
+            /* Removed headers for ChatGPT look */
+        }
+
+        .card-body {
+            padding: 12px 20px;
+            line-height: 1.6;
+            font-size: 1rem;
+            position: relative;
+        }
+
+        /* User Message Style (ChatGPT-like) */
+        .user {
+            align-self: flex-end;
+            margin-bottom: 24px;
+        }
+
+        .user .card-body {
+            background: var(--accent-soft);
+            color: var(--text-main);
+            border-radius: 20px 20px 4px 20px;
+            max-width: 80%;
+            margin-left: auto;
+            border: 1px solid var(--border);
+        }
+
+        [data-theme="dark"] .user .card-body {
+            background: #1e293b;
+            color: #f1f5f9;
+        }
+
+        /* AI Message Style */
+        .ai {
+            align-self: flex-start;
+            margin-bottom: 32px;
+            width: 100%;
+        }
+
+        .ai .card-body {
+            background: transparent;
+            color: var(--text-main);
+            padding-left: 50px;
+            /* Space for icon */
+        }
+
+        /* Minimalist Icons */
+        .ai .card-body::before {
+            content: "X";
+            position: absolute;
+            left: 0;
+            top: 15px;
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 14px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .card-footer {
+            padding-left: 50px;
+            margin-top: -8px;
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            opacity: 0.6;
+            display: flex;
+            gap: 15px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* --- Input Gateway --- */
+        .footer-gateway {
+            padding: 20px 10% 30px;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+        }
+
+        .input-wrapper {
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 10px;
+            display: flex;
+            gap: 12px;
+            box-shadow: var(--shadow);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-wrapper input {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text-main);
+            padding: 14px 24px;
+            font-size: 1.1rem;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .btn-send {
+            background: var(--accent);
+            color: #FFFFFF;
+            border: none;
+            padding: 0 32px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        [data-theme="dark"] .btn-send {
+            color: #020617;
+        }
+
+        .btn-send:hover {
+            opacity: 0.95;
+            transform: scale(1.02);
+        }
+
+        .compliance-note {
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-top: 16px;
+            letter-spacing: 0.02em;
+        }
+
+        /* --- Loading --- */
+        .loading-ring {
+            display: inline-flex;
+            gap: 6px;
+        }
+
+        .loading-ring span {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 0.8s infinite alternate;
+        }
+
+        .loading-ring span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading-ring span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes pulse {
+            to {
+                opacity: 0.3;
+                transform: scale(0.8);
+            }
+        }
+
+        /* --- Icons --- */
+        .icon {
+            width: 22px;
+            height: 22px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* --- Scrollbar --- */
+        .workspace::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .workspace::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .workspace::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+        }
+
+        .workspace::-webkit-scrollbar-thumb:hover {
+            background: var(--text-dim);
+        }
+
+        /* Markdown Styles */
+        .card-body h1,
+        .card-body h2 {
+            color: var(--accent);
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+
+        .card-body p {
+            margin-bottom: 16px;
+        }
+
+        .card-body ul,
+        .card-body ol {
+            margin-left: 24px;
+            margin-bottom: 20px;
+        }
+
+        .card-body li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body data-theme="dark">
+
+    <header class="header">
+        <div class="brand-group">
+            <div class="logo-box">X</div>
+            <div class="brand-text">
+                <h1>xInsur AI</h1>
+                <span>Insurance Advisory Gateway</span>
+            </div>
+        </div>
+
+        <div class="header-actions">
+
+
+            <button class="btn-export" onclick="exportConversation()" title="Export PDF">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                Export Report
+            </button>
+
+            <button class="theme-toggle-btn" id="themeToggle" title="Toggle Theme">
+                <svg id="sun-icon" class="icon" style="display: none;" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="4" />
+                    <path d="M12 2v2" />
+                    <path d="M12 20v2" />
+                    <path d="m4.93 4.93 1.41 1.41" />
+                    <path d="m17.66 17.66 1.41 1.41" />
+                    <path d="M2 12h2" />
+                    <path d="M20 12h2" />
+                    <path d="m6.34 17.66-1.41 1.41" />
+                    <path d="m19.07 4.93-1.41 1.41" />
+                </svg>
+                <svg id="moon-icon" class="icon" viewBox="0 0 24 24">
+                    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+                </svg>
+            </button>
+
+            <div id="clock"
+                style="font-family: 'JetBrains Mono'; font-size: 0.85rem; color: var(--text-dim); border-left: 1px solid var(--border); padding-left: 20px; min-width: 100px;">
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <button class="btn-new-chat" onclick="createNewChat()">
+                    <svg class="icon" style="width: 16px; height: 16px;" viewBox="0 0 24 24">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    New Analysis
+                </button>
+            </div>
+            <div class="history-list" id="historyList">
+                <div class="history-section-label">Analysis History</div>
+                <!-- History Items -->
+            </div>
+        </aside>
+
+        <div class="chat-main">
+            <main class="workspace" id="chatContainer">
+                <div class="welcome-hero" id="welcomeHero">
+                    <h2>Xlnsur AI</h2>
+                    <p>High-fidelity policy analysis engine synchronized with your enterprise knowledge layers. Powered
+                        by deterministic RAG reasoning protocols.</p>
+                </div>
+                <div id="chatFeed"></div>
+            </main>
+
+            <footer class="footer-gateway">
+                <form id="chatForm" class="input-wrapper">
+                    <input type="text" id="userInput"
+                        placeholder="Ask about policy coverage, claims, or analytical insights..." autocomplete="off">
+                    <button type="submit" id="submitBtn" class="btn-send">Analyze</button>
+                </form>
+
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin;
+        const chatFeed = document.getElementById('chatFeed');
+        const chatForm = document.getElementById('chatForm');
+        const userInput = document.getElementById('userInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const themeToggle = document.getElementById('themeToggle');
+        const chatContainer = document.getElementById('chatContainer');
+        const historyList = document.getElementById('historyList');
+
+        let currentChatId = Date.now().toString();
+        let history = JSON.parse(localStorage.getItem('xinsur_history') || '[]');
+
+        function saveHistory() {
+            localStorage.setItem('xinsur_history', JSON.stringify(history));
+            renderHistory();
+        }
+
+        function autoSaveChat() {
+            if (chatFeed.children.length === 0) return;
+
+            const firstMsgStr = chatFeed.querySelector('.user .card-body')?.innerText || "Blank Analysis";
+            const title = firstMsgStr.length > 30 ? firstMsgStr.substring(0, 30) + "..." : firstMsgStr;
+
+            const chatData = {
+                id: currentChatId,
+                title: title,
+                content: chatFeed.innerHTML,
+                timestamp: new Date().toISOString()
+            };
+
+            const existingIndex = history.findIndex(h => h.id === currentChatId);
+            if (existingIndex > -1) {
+                history[existingIndex] = chatData;
+            } else {
+                history.unshift(chatData);
+            }
+            saveHistory();
+        }
+
+        function createNewChat() {
+            autoSaveChat();
+            currentChatId = Date.now().toString();
+            chatFeed.innerHTML = "";
+            document.getElementById('welcomeHero').style.display = 'block';
+            renderHistory();
+        }
+
+        function loadChat(id) {
+            const chat = history.find(h => h.id === id);
+            if (chat) {
+                currentChatId = chat.id;
+                chatFeed.innerHTML = chat.content;
+                document.getElementById('welcomeHero').style.display = 'none';
+                renderHistory();
+            }
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('historyList');
+            list.innerHTML = '<div class="history-section-label">Analysis History</div>';
+
+            history.forEach(chat => {
+                const item = document.createElement('div');
+                item.className = `history-item ${chat.id === currentChatId ? 'active' : ''}`;
+                item.innerHTML = `
+                    <svg class="icon" style="width: 14px; height: 14px; opacity: 0.7;" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    ${chat.title}
+                `;
+                item.onclick = () => loadChat(chat.id);
+                list.appendChild(item);
+            });
+        }
+
+        // Initialize history on load
+        renderHistory();
+
+        // Theme Logic
+        function setTheme(theme) {
+            document.body.setAttribute('data-theme', theme);
+            const sunIcon = document.getElementById('sun-icon');
+            const moonIcon = document.getElementById('moon-icon');
+
+            if (theme === 'dark') {
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+            } else {
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+            }
+            localStorage.setItem('xinsur-v2-theme', theme);
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const current = document.body.getAttribute('data-theme');
+            setTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
+        const savedTheme = localStorage.getItem('xinsur-v2-theme') || 'dark';
+        setTheme(savedTheme);
+
+        // Clock Logic
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            document.getElementById('clock').innerText = timeStr + ' UTC';
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        marked.setOptions({ breaks: true, gfm: true });
+
+        // Chat Logic
+        document.getElementById('chatForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const msg = userInput.value.trim();
+            if (!msg) return;
+
+            document.getElementById('welcomeHero').style.display = 'none';
+            appendCard(msg, 'user');
+            userInput.value = '';
+            const loadingId = appendLoading();
+
+            try {
+                const res = await fetch(`${API_URL}/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: msg })
+                });
+                removeLoading(loadingId);
+                appendCard(data.response, 'ai');
+                autoSaveChat();
+            } catch (err) {
+                removeLoading(loadingId);
+                appendCard("Institutional Node Disconnected. Please verify your secure gateway connection.", 'ai');
+                autoSaveChat();
+            }
+        });
+
+        function appendCard(text, type) {
+            const card = document.createElement('div');
+            card.className = `card ${type}`;
+
+            if (type === 'user') {
+                card.innerHTML = `
+                    <div class="card-body">${text}</div>
+                `;
+            } else {
+                card.innerHTML = `
+                    <div class="card-body">${marked.parse(text)}</div>
+                `;
+            }
+            chatFeed.appendChild(card);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function appendLoading() {
+            const id = 'l_' + Date.now();
+            const div = document.createElement('div');
+            div.id = id;
+            div.className = 'card ai';
+            div.innerHTML = `
+                <div class="card-body" style="opacity: 0.6; display: flex; align-items: center; gap: 16px;">
+                    <div class="loading-ring"><span></span><span></span><span></span></div>
+                    <em>Processing deterministic inference...</em>
+                </div>
+            `;
+            chatFeed.appendChild(div);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            return id;
+        }
+
+        function removeLoading(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        async function exportConversation() {
+            const feed = document.getElementById('chatFeed');
+            if (!feed || feed.children.length === 0) {
+                alert("Institutional Alert: No analytical data available for export.");
+                return;
+            }
+
+            // Construct isolation-ready HTML for the PDF
+            let pdfContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600&display=swap" rel="stylesheet">
+                <style>
+                    body { font-family: 'Inter', sans-serif; padding: 40px; color: #000; background: #fff; }
+                    .header { border-bottom: 2px solid #2563EB; padding-bottom: 20px; margin-bottom: 40px; }
+                    .header h1 { margin: 0; font-family: 'Outfit', sans-serif; font-size: 24px; color: #000; }
+                    .header p { margin: 5px 0 0 0; color: #444; font-size: 12px; }
+                    .protocol { color: #2563EB; font-weight: bold; font-size: 11px; margin-top: 5px; }
+                    
+                    .thread { display: flex; flex-direction: column; gap: 30px; }
+                    .message { position: relative; width: 100%; page-break-inside: avoid; display: block; clear: both; }
+                    
+                    /* User Message - Right Aligned Pill */
+                    .user-container { float: right; width: 100%; display: block; margin-bottom: 20px; }
+                    .user-bubble { 
+                        float: right;
+                        background: #F1F5F9; 
+                        padding: 12px 20px; 
+                        border-radius: 18px 18px 4px 18px; 
+                        max-width: 80%;
+                        border: 1px solid #E2E8F0;
+                        color: #000 !important;
+                        font-size: 14px;
+                        font-weight: 500;
+                    }
+
+                    /* AI Message - Left Aligned with Icon */
+                    .ai-container { float: left; width: 100%; display: block; padding-left: 45px; margin-bottom: 20px; position: relative; }
+                    .ai-icon {
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        width: 32px;
+                        height: 32px;
+                        background: #2563EB;
+                        color: #fff;
+                        border-radius: 8px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-weight: 800;
+                        font-size: 14px;
+                        font-family: 'Outfit', sans-serif;
+                    }
+                    .ai-content { 
+                        color: #000 !important;
+                        font-size: 14px;
+                        line-height: 1.6;
+                    }
+                    .ai-footer {
+                        margin-top: 8px;
+                        font-size: 10px;
+                        color: #64748B;
+                        font-family: monospace;
+                    }
+                    
+                    h1, h2, h3 { color: #2563EB !important; margin: 15px 0 10px 0; font-size: 16px; font-weight: 700; }
+                    p, li, span, div { color: #000 !important; opacity: 1 !important; visibility: visible !important; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>xInsur AI | Advisory Report</h1>
+                    <p>REPORT_ID: ${Math.random().toString(36).substr(2, 9).toUpperCase()} | GENERATED: ${new Date().toLocaleString()} UTC</p>
+                    <div class="protocol">GOVERNANCE PROTOCOL: SR 11-7 ENFORCED</div>
+                </div>
+                <div class="thread">
+            `;
+
+            const cards = feed.querySelectorAll('.card');
+            cards.forEach(card => {
+                const isUser = card.classList.contains('user');
+                const bodyHTML = card.querySelector('.card-body').innerHTML;
+                const footerText = card.querySelector('.card-footer')?.innerText || "";
+
+                if (isUser) {
+                    pdfContent += `
+                        <div class="message user-container">
+                            <div class="user-bubble">${card.querySelector('.card-body').innerText}</div>
+                        </div>
+                    `;
+                } else {
+                    pdfContent += `
+                        <div class="message ai-container">
+                            <div class="ai-icon">X</div>
+                            <div class="ai-content">${bodyHTML}</div>
+                        </div>
+                    `;
+                }
+            });
+
+            pdfContent += `</div></body></html>`;
+
+            const opt = {
+                margin: 0.5,
+                filename: `xInsur_Advisory_${Date.now()}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+
+            try {
+                await html2pdf().set(opt).from(pdfContent).save();
+            } catch (err) {
+                console.error("PDF Export Error:", err);
+                alert("Institutional Error: PDF generation failed.");
+            }
+        }
+    </script>
+</body>
+
+</html>
