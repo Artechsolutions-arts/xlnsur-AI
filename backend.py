@@ -57,11 +57,11 @@ try:
     audit_logger = AuditLogger()
     risk_guardian = ModelRiskGuardian(confidence_threshold=0.65)
     print("✅ Governance Module Loaded (PII Scrubbing, Audit Logging & Risk Guardian Active)")
-except ImportError:
+except Exception as e:
     pii_scrubber = None
     audit_logger = None
     risk_guardian = None
-    print("⚠️ Governance Module Loading Failed")
+    print(f"⚠️ Governance Module Loading Failed: {e}")
 
 # Global variables for storing the knowledge base
 chunks = []
