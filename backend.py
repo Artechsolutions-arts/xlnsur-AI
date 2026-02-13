@@ -1,6 +1,7 @@
 # backend.py - FastAPI Backend for Insurance Chatbot
 
 import os
+import json
 import requests
 import numpy as np
 import pandas as pd
@@ -737,10 +738,11 @@ async def chat(request: ChatRequest):
         )
         
         # --- Governance Layer 4: Model Risk Validation ---
-        validation = risk_guardian.validate_response(sanitized_msg, response, avg_confidence)
-        if not validation["safe"]:
-            response = validation["message"]
-            print(f"🛑 Risk Guardian Intercepted Response: {validation['reason']}")
+        if risk_guardian:
+            validation = risk_guardian.validate_response(sanitized_msg, response, avg_confidence)
+            if not validation["safe"]:
+                response = validation["message"]
+                print(f"🛑 Risk Guardian Intercepted Response: {validation['reason']}")
 
         final_response = disclaimer + response
 
@@ -752,7 +754,8 @@ async def chat(request: ChatRequest):
         return ChatResponse(response=final_response, intent=intent)
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error processing request: {str(e)}")
+        print(f"❌ Chat endpoint error: {e}")
+        return ChatResponse(response=f"I encountered a processing error. Please try again. (Detail: {str(e)})", intent="error")
 
 @app.post("/clear-history")
 async def clear_history():
