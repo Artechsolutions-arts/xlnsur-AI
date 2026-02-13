@@ -471,65 +471,81 @@ async def lifespan(app: FastAPI):
     pass
 
 def full_kb_init_background():
-    """Sequential init: PDF -> Website -> Embeddings"""
+    """Sequential init: PDF -> Embeddings (Memory-optimized for Railway 512MB)"""
     global chunks, index
+    import gc
+    
     try:
         # 1. Locate PDF
         base_dir = os.path.dirname(os.path.abspath(__file__))
         pdf_path = os.path.join(base_dir, "ICICI_Insurance.pdf")
         
         print(f"📂 KB Init: base_dir = {base_dir}")
-        print(f"📂 KB Init: pdf_path = {pdf_path}")
         print(f"📂 KB Init: PDF exists = {os.path.exists(pdf_path)}")
         
-        # List files in base_dir for debugging
-        try:
-            files = os.listdir(base_dir)
-            pdf_files = [f for f in files if f.endswith('.pdf')]
-            print(f"� KB Init: PDF files found = {pdf_files}")
-            print(f"📂 KB Init: Total files in dir = {len(files)}")
-        except Exception as le:
-            print(f"⚠️ KB Init: Could not list directory: {le}")
-        
-        if os.path.exists(pdf_path):
-            print(f"📄 KB Init: Extracting PDF...")
-            file_size = os.path.getsize(pdf_path)
-            print(f"📄 KB Init: PDF file size = {file_size} bytes")
-            
-            with pdfplumber.open(pdf_path) as pdf:
-                print(f"📄 KB Init: PDF has {len(pdf.pages)} pages")
-                texts = [p.extract_text() for p in pdf.pages if p.extract_text()]
-                pdf_text = clean_pdf("".join(texts))
-            
-            print(f"📄 KB Init: Extracted {len(pdf_text)} chars from PDF")
-            
-            if pdf_text:
-                new_chunks = simple_chunk_text(pdf_text, 500)
-                chunks.extend(new_chunks)
-                print(f"✅ KB Init: {len(chunks)} segments loaded")
-            else:
-                print("⚠️ KB Init: PDF text was empty after cleaning")
-        else:
+        if not os.path.exists(pdf_path):
             print(f"❌ KB Init: PDF NOT FOUND at {pdf_path}")
+            return
         
-        # 2. Build FAISS index with embeddings
+        file_size = os.path.getsize(pdf_path)
+        print(f"📄 KB Init: PDF file size = {file_size} bytes")
+        
+        # 2. Extract PDF PAGE BY PAGE (memory efficient)
+        print("� KB Init: Extracting PDF page-by-page...")
+        page_texts = []
+        
+        with pdfplumber.open(pdf_path) as pdf:
+            total_pages = len(pdf.pages)
+            print(f"📄 KB Init: PDF has {total_pages} pages")
+            
+            for i, page in enumerate(pdf.pages):
+                text = page.extract_text()
+                if text:
+                    page_texts.append(text)
+                
+                # Log progress every 20 pages
+                if (i + 1) % 20 == 0 or (i + 1) == total_pages:
+                    print(f"📄 KB Init: Processed {i+1}/{total_pages} pages")
+        
+        # 3. Clean and chunk
+        combined_text = "\n".join(page_texts)
+        del page_texts  # Free memory
+        gc.collect()
+        
+        print(f"📄 KB Init: Total extracted text = {len(combined_text)} chars")
+        
+        cleaned = clean_pdf(combined_text)
+        del combined_text  # Free memory
+        gc.collect()
+        
+        if cleaned:
+            new_chunks = simple_chunk_text(cleaned, 500)
+            del cleaned  # Free memory
+            gc.collect()
+            
+            chunks.extend(new_chunks)
+            print(f"✅ KB Init: {len(chunks)} segments loaded")
+        else:
+            print("⚠️ KB Init: PDF text was empty after cleaning")
+            return
+        
+        # 4. Build FAISS index with embeddings (batched)
         if chunks and JINA_API_KEY:
             print(f"🔄 KB Init: Building embeddings for {len(chunks)} chunks...")
             embeds = embed_with_jina(chunks, JINA_API_KEY)
-            print(f"✅ KB Init: Embeddings shape = {embeds.shape}")
-            index = build_index(embeds)
-            print(f"✅ KB Init: FAISS index built. AI search ready!")
-        elif not chunks:
-            print("⚠️ KB Init: No chunks to embed")
+            if embeds is not None and len(embeds) > 0:
+                print(f"✅ KB Init: Embeddings shape = {embeds.shape}")
+                index = build_index(embeds)
+                print(f"✅ KB Init: FAISS index built. Full RAG search ready!")
+            else:
+                print("⚠️ KB Init: Embeddings failed, keyword search still active")
         elif not JINA_API_KEY:
-            print("⚠️ KB Init: JINA_API_KEY not set, skipping embeddings")
+            print("⚠️ KB Init: JINA_API_KEY not set, keyword search only")
             
     except Exception as e:
         print(f"❌ KB Init FAILED: {type(e).__name__}: {e}")
         import traceback
         traceback.print_exc()
-
-
 def fast_init_pdf_and_web():
     """Quickly load text from PDF and Website so keyword search is active"""
     global chunks
