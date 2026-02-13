@@ -17,26 +17,45 @@ load_dotenv()
 JINA_API_KEY = os.getenv("JINA_API_KEY")
 
 def clean_pdf(text):
-    text = re.sub(r'\s+', ' ', text)
-    text = re.sub(r'[^\x20-\x7E\n]', '', text)
+    """Clean PDF text by removing headers, footers, and formatting issues (Matches backend.py)"""
+    text = re.sub(r'Page \d+\n', '', text)  # Remove page numbers
+    text = re.sub(r'ICICI .*?\n', '', text) # Remove ICICI header/footer
+    text = re.sub(r'IRDAI Regn.*?\n', '', text) # Remove regulator lines
+    text = re.sub(r'(\w+)-\s*\n\s*(\w+)', r'\1\2', text) # Fix hyphenated words
+    text = re.sub(r'[\u2022•]', '-', text) # Replace bullets with dash
+    text = re.sub(r'(?<![.!?])\n', ' ', text) # Join lines that don't end with punctuation
+    text = re.sub(r'\n+', '\n', text) # Remove extra newlines
+    text = re.sub(r' {2,}', ' ', text) # Remove extra spaces
     return text.strip()
 
 def simple_chunk_text(text, chunk_size=500):
+    """
+    Smarter chunking that respects sentence boundaries. (Matches backend.py)
+    """
+    import re
+    sentences = re.split(r'(?<=[.!?])\s+', text)
+    
     chunks = []
-    words = text.split()
     current_chunk = []
     current_length = 0
-    for word in words:
-        word_length = len(word) + 1
-        if current_length + word_length > chunk_size and current_chunk:
-            chunks.append(' '.join(current_chunk))
-            current_chunk = [word]
-            current_length = word_length
+    
+    for sentence in sentences:
+        sentence = sentence.strip()
+        if not sentence: continue
+            
+        sentence_len = len(sentence)
+        
+        if current_length + sentence_len > chunk_size and current_chunk:
+            chunks.append(" ".join(current_chunk))
+            current_chunk = [sentence]
+            current_length = sentence_len
         else:
-            current_chunk.append(word)
-            current_length += word_length
+            current_chunk.append(sentence)
+            current_length += sentence_len
+            
     if current_chunk:
-        chunks.append(' '.join(current_chunk))
+        chunks.append(" ".join(current_chunk))
+        
     return chunks
 
 def embed_with_jina(texts, api_key, batch_size=16):

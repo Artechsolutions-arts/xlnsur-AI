@@ -142,27 +142,38 @@ def chunk_with_jina(text: str, api_key: str, max_len: int = 8000):
 
     return chunks
 
-def simple_chunk_text(text: str, chunk_size: int = 500):
-    """Simple text chunking fallback"""
+def simple_chunk_text(text, chunk_size=500):
+    """
+    Smarter chunking that respects sentence boundaries.
+    """
+    # Split by sentence delimiters (period, question, exclamation) followed by space/newline
+    # Using a lookahead to keep the delimiter with the sentence
+    import re
+    sentences = re.split(r'(?<=[.!?])\s+', text)
+    
     chunks = []
-    words = text.split()
     current_chunk = []
     current_length = 0
     
-    for word in words:
-        word_length = len(word) + 1  # +1 for space
+    for sentence in sentences:
+        sentence = sentence.strip()
+        if not sentence: continue
+            
+        sentence_len = len(sentence)
         
-        if current_length + word_length > chunk_size and current_chunk:
-            chunks.append(' '.join(current_chunk))
-            current_chunk = [word]
-            current_length = word_length
+        # If adding this sentence exceeds chunk size, save current chunk (if not empty)
+        if current_length + sentence_len > chunk_size and current_chunk:
+            chunks.append(" ".join(current_chunk))
+            current_chunk = [sentence]
+            current_length = sentence_len
         else:
-            current_chunk.append(word)
-            current_length += word_length
-    
+            current_chunk.append(sentence)
+            current_length += sentence_len
+            
+    # Add the last chunk
     if current_chunk:
-        chunks.append(' '.join(current_chunk))
-    
+        chunks.append(" ".join(current_chunk))
+        
     return chunks
 
 def embed_with_jina(texts, api_key, batch_size=16):
@@ -239,13 +250,51 @@ def embed_query_jina(query, api_key):
     else:
         raise Exception(f"Query embedding failed: {resp.status_code}, {resp.text}")
 
-def search(query, index, chunks, api_key, top_k=3):
-    """Search for relevant chunks using FAISS. Returns chunks and their similarity scores."""
+def search(query, index, chunks, api_key, top_k=7):
+    """
+    HYBRID SEARCH: 
+    1. Vector Search (Semantic)
+    2. Keyword Boosting (Literal)
+    Returns merged chunks and max score.
+    """
+    # 1. Vector Search
     q_vec = embed_query_jina(query, api_key)
     faiss.normalize_L2(q_vec)
     D, I = index.search(q_vec, top_k)
-    # D contains cosine similarities since we normalized
-    return [chunks[i] for i in I[0]], D[0]
+    
+    vector_results = [chunks[i] for i in I[0]]
+    vector_scores = D[0]
+    max_score = np.max(vector_scores)
+    
+    # 2. Keyword Boosting (if vector confidence isn't perfect or just to be safe)
+    # Extract robust keywords (len > 4 to avoid 'the', 'and')
+    import re
+    keywords = list(set([w for w in re.findall(r'\w{4,}', query.lower()) if w not in ['what', 'when', 'where', 'which', 'this', 'that']]))
+    
+    keyword_results = []
+    if keywords:
+        for chunk in chunks:
+            # Simple count of keyword overlap
+            chunk_lower = chunk.lower()
+            matches = sum(1 for k in keywords if k in chunk_lower)
+            if matches >= 2: # At least 2 keywords must match
+                keyword_results.append(chunk)
+                
+        # Limit keyword results to keep context clean
+        keyword_results = sorted(keyword_results, key=len, reverse=True)[:3]
+        
+    # 3. Merge Results (Deduplicate)
+    final_chunks = []
+    seen = set()
+    
+    # Prioritize vector results, then keyword boosters
+    for c in vector_results + keyword_results:
+        if c not in seen:
+            final_chunks.append(c)
+            seen.add(c)
+            
+    # Return top_k merged results but keep the vector score as the confidence metric
+    return final_chunks[:top_k], vector_scores
 
 def rerank_with_jina(query, docs, api_key, top_n=3):
     """Rerank documents using Jina Reranker API"""
@@ -494,7 +543,7 @@ def full_kb_init_background():
             print(f"✅ KB Init: {len(chunks)} segments loaded from cache")
         else:
             print("⚠️ KB Init: chunks.json not found, falling back to PDF extraction...")
-            # Lightweight fallback: extract PDF but skip embeddings
+            # Lightweight fallback: extract PDF but skip embeddings initially
             pdf_path = os.path.join(base_dir, "ICICI_Insurance.pdf")
             if os.path.exists(pdf_path) and pdfplumber:
                 import gc
@@ -508,10 +557,17 @@ def full_kb_init_background():
                 del page_texts
                 gc.collect()
                 if combined:
-                    chunks.extend(simple_chunk_text(combined, 500))
+                    new_chunks = simple_chunk_text(combined, 500)
+                    chunks.clear()
+                    chunks.extend(new_chunks)
                     del combined
                     gc.collect()
-                    print(f"✅ KB Init: {len(chunks)} segments from PDF (keyword search only)")
+                    print(f"✅ KB Init: {len(chunks)} segments from PDF (keyword search active)")
+                    
+                    # Trigger embedding generation to complete training
+                    print("🔄 Triggering live embedding generation...")
+                    generate_embeddings_background()
+                    
             return
         
         # Load pre-computed FAISS index
