@@ -4,9 +4,9 @@
         "builder": "NIXPACKS"
     },
     "deploy": {
-        "startCommand": "python backend.py",
+        "startCommand": "uvicorn backend:app --host 0.0.0.0 --port $PORT",
         "restartPolicyType": "ON_FAILURE",
-        "healthcheckPath": "/health",
+        "healthcheckPath": "/healthz",
         "healthcheckTimeout": 300
     }
 }
