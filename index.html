@@ -872,7 +872,7 @@
 
                 const data = await res.json();
                 removeLoading(loadingId);
-                appendCard(data.response, 'ai');
+                appendCard(data.response, 'ai', data.metric_latency);
                 autoSaveChat();
             } catch (err) {
                 console.error("Analytical Node Error:", err);
@@ -882,7 +882,7 @@
             }
         });
 
-        function appendCard(text, type) {
+        function appendCard(text, type, latency = 0) {
             const card = document.createElement('div');
             card.className = `card ${type}`;
 
@@ -891,8 +891,14 @@
                     <div class="card-body">${text}</div>
                 `;
             } else {
+                const latencyDisplay = latency > 0 ? `${latency.toFixed(0)} ms` : "Instant";
                 card.innerHTML = `
                     <div class="card-body">${marked.parse(text)}</div>
+                    <div class="card-footer">
+                        <span>Verified by Risk Guardian™</span>
+                        <span>•</span>
+                        <span>${latencyDisplay}</span>
+                    </div>
                 `;
             }
             chatFeed.appendChild(card);

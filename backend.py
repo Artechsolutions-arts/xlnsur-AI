@@ -805,6 +805,7 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     response: str
     intent: str
+    metric_latency: float = 0.0
 
 class HealthResponse(BaseModel):
     status: str
@@ -907,7 +908,7 @@ async def chat(request: ChatRequest):
             if audit_logger:
                 audit_logger.log_event("RAG_RETRIEVAL", "user_session_1", sanitized_msg, final_response[:200]+"...", bool(detected_pii), latency)
             
-            return ChatResponse(response=final_response, intent=intent)
+            return ChatResponse(response=final_response, intent=intent, metric_latency=latency)
 
     # Completely fallback if nothing is loaded yet
     if not chunks:
@@ -957,7 +958,7 @@ async def chat(request: ChatRequest):
         if audit_logger:
             audit_logger.log_event("FULL_RAG", "user_session_1", sanitized_msg, final_response[:200]+"...", bool(detected_pii), latency, avg_confidence)
             
-        return ChatResponse(response=final_response, intent=intent)
+        return ChatResponse(response=final_response, intent=intent, metric_latency=latency)
         
     except Exception as e:
         print(f"❌ Chat endpoint error: {e}")
