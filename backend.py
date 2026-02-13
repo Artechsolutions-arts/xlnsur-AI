@@ -576,9 +576,10 @@ app = FastAPI(
 )
 
 # Standardize security headers and CORS for Railway deployment
+origins = os.getenv("ALLOWED_ORIGINS", "*").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -814,11 +815,12 @@ if __name__ == "__main__":
     if not JINA_API_KEY:
         print("Warning: JINA_API_KEY environment variable not set")
     
-    # Railway readiness: Bind to PORT provided by host
-    port = int(os.getenv("PORT", 8050))
+    # Railway readiness: Prioritize injected PORT, then user's API_PORT
+    port = int(os.getenv("PORT", os.getenv("API_PORT", 8050)))
+    host = os.getenv("API_HOST", "0.0.0.0")
     
     try:
-        print(f"🚀 xInsur AI EIIP starting on port {port}")
-        uvicorn.run(app, host="0.0.0.0", port=port)
+        print(f"🚀 xInsur AI EIIP starting on {host}:{port}")
+        uvicorn.run(app, host=host, port=port)
     except Exception as e:
         print(f"❌ CRITICAL ERROR: {e}")
