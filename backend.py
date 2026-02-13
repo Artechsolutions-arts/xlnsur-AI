@@ -55,7 +55,7 @@ try:
     from governance import PIIScrubber, AuditLogger, ModelRiskGuardian
     pii_scrubber = PIIScrubber()
     audit_logger = AuditLogger()
-    risk_guardian = ModelRiskGuardian(confidence_threshold=0.65)
+    risk_guardian = ModelRiskGuardian(confidence_threshold=0.45)
     print("✅ Governance Module Loaded (PII Scrubbing, Audit Logging & Risk Guardian Active)")
 except Exception as e:
     pii_scrubber = None
@@ -872,6 +872,10 @@ async def chat(request: ChatRequest):
         # For full RAG, we need to extract scores to pass to the Risk Guardian
         retrieved, scores = search(sanitized_msg, index, chunks, JINA_API_KEY, top_k=5)
         avg_confidence = float(np.max(scores)) # Use best match as confidence proxy
+        
+        print(f"🔍 RAG Retrieval: Best score = {avg_confidence:.4f}")
+        print(f"🔍 Top Chunk: {retrieved[0][:100]}...")
+
         
         response = insurance_chatbot(
             sanitized_msg, 

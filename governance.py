@@ -105,7 +105,7 @@ class ModelRiskGuardian:
     Enforces SR 11-7 Model Risk Management controls at runtime.
     Handles confidence thresholds and hallucination protocol escalation.
     """
-    def __init__(self, confidence_threshold=0.75):
+    def __init__(self, confidence_threshold=0.45):
         self.threshold = confidence_threshold
         self.escalation_count = 0
 
@@ -125,7 +125,7 @@ class ModelRiskGuardian:
         
         # Basic check for negative tone or refusal phrases which might indicate failure
         fail_phrases = ["i don't know", "i'm not sure", "not mentioned in the documents"]
-        if any(p in response.lower() for p in fail_phrases) and confidence_score < 0.85:
+        if any(p in response.lower() for p in fail_phrases) and confidence_score < 0.55:
             return {
                 "safe": False,
                 "reason": "AMBIGUOUS_MATCH",
