@@ -15,8 +15,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project
 COPY . .
 
-# Expose port
-EXPOSE 8000
+# Expose port (Documentation only, logic is in backend.py)
+EXPOSE 8050
 
 # Run the application
 CMD ["python", "backend.py"]

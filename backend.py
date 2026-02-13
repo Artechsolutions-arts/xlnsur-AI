@@ -10,7 +10,7 @@ from openai import OpenAI
 import faiss
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
 from typing import List, Dict, Any
 import argparse
@@ -571,14 +571,14 @@ def initialize_knowledge_base_sync():
 app = FastAPI(
     title="xInsur AI Enterprise Gateway",
     description="Institutional-grade insurance intelligence platform",
-    version="2.1.0",
+    version="2.2.0",
     lifespan=lifespan
 )
 
-# Mandatory CORS liberalization for Railway production gateway
+# Deep-Clean CORS: Force open for Railway Production
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -589,6 +589,11 @@ async def serve_dashboard():
     """Serve the primary institutional intelligence dashboard"""
     base_dir = os.path.dirname(os.path.abspath(__file__))
     return FileResponse(os.path.join(base_dir, "index.html"))
+
+@app.get("/healthz")
+async def liveness_check():
+    """Simple liveness check for Railway infrastructure"""
+    return JSONResponse(content={"status": "online"}, status_code=200)
 
 # Pydantic models
 class ChatRequest(BaseModel):
@@ -814,12 +819,17 @@ if __name__ == "__main__":
     if not JINA_API_KEY:
         print("Warning: JINA_API_KEY environment variable not set")
     
-    # Railway readiness: Prioritize injected PORT, then user's API_PORT
+    # FINAL HARNESS: Force bind to host's dynamic port
     port = int(os.getenv("PORT", os.getenv("API_PORT", 8050)))
     host = os.getenv("API_HOST", "0.0.0.0")
     
     try:
-        print(f"🚀 xInsur AI EIIP starting on {host}:{port}")
-        uvicorn.run(app, host=host, port=port)
+        print("--------------------------------------------------")
+        print(f"� GATEWAY_INIT: Binding to {host}:{port}")
+        print(f"🔐 GOVERNANCE: SR 11-7 Protocols Loaded")
+        print(f"🚀 VERSION: 2.2.0 Active")
+        print("--------------------------------------------------")
+        
+        uvicorn.run(app, host=host, port=port, log_level="info")
     except Exception as e:
-        print(f"❌ CRITICAL ERROR: {e}")
+        print(f"❌ CRITICAL_ERROR: {e}")
