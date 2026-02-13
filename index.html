@@ -766,17 +766,25 @@
             const loadingId = appendLoading();
 
             try {
-                const res = await fetch(`${API_URL}/chat`, {
+                const res = await fetch('/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: msg })
                 });
+
+                if (!res.ok) {
+                    const errData = await res.json().catch(() => ({}));
+                    throw new Error(errData.detail || `Node Error: ${res.status}`);
+                }
+
+                const data = await res.json();
                 removeLoading(loadingId);
                 appendCard(data.response, 'ai');
                 autoSaveChat();
             } catch (err) {
+                console.error("Analytical Node Error:", err);
                 removeLoading(loadingId);
-                appendCard("Institutional Node Disconnected. Please verify your secure gateway connection.", 'ai');
+                appendCard(`Institutional Node Offline (${err.message}). Please verify your institutional gateway deployment.`, 'ai');
                 autoSaveChat();
             }
         });
